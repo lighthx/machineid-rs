@@ -81,20 +81,18 @@ pub(crate) fn get_disk_id() -> Result<String, HWIDError> {
     Ok(uuid)
 }
 
-#[cfg(target_os = "linux")]
 fn run_command(command: &str) -> Result<String, HWIDError> {
     let mut cmd = Command::new("sh");
     let cmd = cmd.arg("-c").arg(command);
 
     let output = cmd.output()?;
-    if !cmd.status()?.success() {
+    if !output.status.success() {
         return Err(HWIDError::new(
             &format!("Failed to run command: {command}"),
-            &String::from_utf8(output.stderr.into())?,
+            &String::from_utf8(output.stderr)?,
         ));
     }
-
-    Ok(String::from_utf8(cmd.output()?.stdout)?)
+    Ok(String::from_utf8(output.stdout)?)
 }
 
 #[cfg(target_os = "linux")]
@@ -112,7 +110,7 @@ pub(crate) fn get_mac_address() -> Result<String, HWIDError> {
     // Names incorporating physical/geographical location of the connector of the hardware (example: enp2s0)
     // Names incorporating the interfaces's MAC address (example: enx78e7d1ea46da), we are going to ignore it for now
     // Classic, unpredictable kernel-native ethX naming (example: eth0)
-    let result = get_mac_addressof_interface(&"wlan0");
+    let result = get_mac_addressof_interface(&"eth0");
     if result.is_ok() {
         return result;
     }

@@ -110,15 +110,23 @@ pub(crate) fn get_mac_address() -> Result<String, HWIDError> {
     // Names incorporating physical/geographical location of the connector of the hardware (example: enp2s0)
     // Names incorporating the interfaces's MAC address (example: enx78e7d1ea46da), we are going to ignore it for now
     // Classic, unpredictable kernel-native ethX naming (example: eth0)
-    let result = get_mac_addressof_interface(&"eth0");
+
+    use std::{thread::sleep, time::Duration};
+    let result = get_mac_addressof_interface(&"wlan0");
     if result.is_ok() {
         return result;
     }
-
-    // If everything just fails, we get the (first) default network interface
-    get_mac_addressof_interface(&run_command(
-        "ip route show default | awk '/default/ {print $5; exit}'",
-    )?)
+    for _ in 0..10 {
+        sleep(Duration::from_secs(2));
+        let result = get_mac_addressof_interface(&"wlan0");
+        if result.is_ok() {
+            return result;
+        }
+    }
+    Err(HWIDError::new(
+        "MacAddressError",
+        "Could not find MAC address",
+    ))
 }
 
 #[cfg(target_os = "linux")]

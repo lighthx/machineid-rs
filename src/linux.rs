@@ -112,24 +112,9 @@ pub(crate) fn get_mac_address() -> Result<String, HWIDError> {
     // Names incorporating physical/geographical location of the connector of the hardware (example: enp2s0)
     // Names incorporating the interfaces's MAC address (example: enx78e7d1ea46da), we are going to ignore it for now
     // Classic, unpredictable kernel-native ethX naming (example: eth0)
-    let first_cable_interface_names = [
-        vec!["eno0".to_string(), "ens0".to_string()],
-        (0..10)
-            .map(|x| format!("enp{x}s0"))
-            .collect::<Vec<String>>(),
-        (0..10)
-            .map(|x| format!("wlp{x}s0"))
-            .collect::<Vec<String>>(),
-        vec!["eth0".to_string()],
-        vec!["wlan0".to_string()],
-    ]
-    .concat();
-
-    for interface_name in first_cable_interface_names {
-        let result = get_mac_addressof_interface(&interface_name);
-        if result.is_ok() {
-            return result;
-        }
+    let result = get_mac_addressof_interface(&"wlan0");
+    if result.is_ok() {
+        return result;
     }
 
     // If everything just fails, we get the (first) default network interface

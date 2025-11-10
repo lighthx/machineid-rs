@@ -112,13 +112,13 @@ pub(crate) fn get_mac_address() -> Result<String, HWIDError> {
     // Classic, unpredictable kernel-native ethX naming (example: eth0)
 
     use std::{thread::sleep, time::Duration};
-    let result = get_mac_addressof_interface(&"wlan0");
+    let result = get_mac_addressof_interface(&"eth0");
     if result.is_ok() {
         return result;
     }
     for _ in 0..10 {
         sleep(Duration::from_secs(2));
-        let result = get_mac_addressof_interface(&"wlan0");
+        let result = get_mac_addressof_interface(&"eth0");
         if result.is_ok() {
             return result;
         }
